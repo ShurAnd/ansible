@@ -9,7 +9,7 @@ services:
       - 2223:22
       - 54321:5432
     volumes:
-      - /home/andrey/ansible/second-project/docker/general-files/sshd_config:/etc/ssh/sshd_config
-      - /home/andrey/ansible/second-project/docker/general-files/authorized_keys:/root/.ssh/authorized_keys
-      - /home/andrey/ansible/second-project/docker/general-files/entrypoint.sh:/entrypoint.sh
+      - /home/andrey/ansible-files/general-files/sshd_config:/etc/ssh/sshd_config
+      - /home/andrey/ansible-files/general-files/authorized_keys:/root/.ssh/authorized_keys
+      - /home/andrey/ansible-files/general-files/entrypoint.sh:/entrypoint.sh
     entrypoint: ["./entrypoint.sh"]
