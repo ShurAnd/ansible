@@ -1,0 +1,15 @@
+services:
+  gorn-app:
+    image: gorn-app
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: gorn-app
+    ports:
+      - 2223:22
+      - 54321:5432
+    volumes:
+      - /home/andrey/ansible/second-project/docker/general-files/sshd_config:/etc/ssh/sshd_config
+      - /home/andrey/ansible/second-project/docker/general-files/authorized_keys:/root/.ssh/authorized_keys
+      - /home/andrey/ansible/second-project/docker/general-files/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["./entrypoint.sh"]
