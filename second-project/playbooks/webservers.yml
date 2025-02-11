@@ -1,0 +1,32 @@
+---
+
+- name: Ensure nginx service on webservers hosts
+  hosts: webservers
+  tasks:
+    - name: install nginx service
+      package:
+        name: nginx
+        update_cache: true
+
+    - name: copy nginx config file
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/default
+
+    - name: enable nginx conf
+      file:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-enabled/default
+
+    - name: copy index file
+      template:
+        src: index.html.j2
+        dest: /usr/share/nginx/html/index.html
+
+    - name: enable nginx
+      ansible.builtin.sysvinit:
+        name: nginx
+        state: started
+        enabled: true
+
+...

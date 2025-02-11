@@ -1,0 +1,32 @@
+---
+
+  - name: installing and setup postgres package
+    hosts: db
+    tasks:
+      - name: install postgres
+        package:
+          name:  postgresql
+          state: present
+
+      - name: install python3
+        package:
+          name: python3
+          state: present
+
+      - name: install pip
+        package:
+          name: python3-pip
+          state: present
+
+      - name: "Find out if postgresql initialized"
+        ansible.builtin.stat:
+          path: "/etc/postgresql/16/main/pg_hba.conf"
+        register: inited
+
+      - name: start and enable postgres service
+        ansible.builtin.sysvinit:
+          name: postgresql
+          state: started
+          enabled: true
+
+...
