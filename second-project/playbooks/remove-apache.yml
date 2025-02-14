@@ -1,0 +1,22 @@
+---
+- hosts: webservers
+#  become: true
+  tasks:
+
+  - name: "stop apache2 service"
+    ansible.builtin.sysvinit:
+      name: apache2
+      state: stopped
+      enabled: false
+
+  - name: "remove apache2 package"
+    apt:
+      name: apache2
+      state: absent
+
+  - name: "add php support for apache2"
+    apt:
+      name: libapache2-mod-php
+      state: absent
+
+...
