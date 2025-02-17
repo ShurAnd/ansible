@@ -8,15 +8,40 @@
       name: apache2
       state: stopped
       enabled: false
+    when: ansible_distribution in ['Debian', 'Ubuntu']
 
   - name: "remove apache2 package"
     apt:
       name: apache2
       state: absent
+    when: ansible_distribution in ['Debian', 'Ubuntu']
 
-  - name: "add php support for apache2"
+  - name: "remove php support for apache2"
     apt:
       name: libapache2-mod-php
       state: absent
+    when: ansible_distribution in ['Debian', 'Ubuntu']
+
+  - name: "stop apache2 service for Centos"
+    become: true
+    service:
+      name: httpd
+      state: stopped
+      enabled: false
+    when: ansible_distribution in ['CentOS']
+
+  - name: "remove apache2 package for CentOS"
+    become: true
+    dnf:
+      name: httpd
+      state: absent
+    when: ansible_distribution in ['CentOS']
+
+  - name: "remove php for CentOS"
+    become: true
+    dnf:
+      name: php
+      state: absent
+    when: ansible_distribution in ['CentOS']
 
 ...
