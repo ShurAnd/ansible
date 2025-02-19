@@ -1,0 +1,16 @@
+services:
+  diego-app:
+    image: djo-app
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: djo-app
+    ports:
+      - 8080:80
+      - 8443:443
+      - 2226:22
+    volumes:
+      - /home/andrey/ansible-files/general-files/sshd_config:/etc/ssh/sshd_config
+      - /home/andrey/ansible-files/general-files/authorized_keys:/root/.ssh/authorized_keys
+      - /home/andrey/ansible-files/general-files/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["./entrypoint.sh"]
