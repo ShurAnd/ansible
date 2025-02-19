@@ -1,0 +1,47 @@
+---
+- hosts: webservers
+#  become: true
+  tasks:
+
+  - name: "install apache2 and php packages for ubuntu"
+    package:
+      name:
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: true
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: "start apache2 service"
+    ansible.builtin.sysvinit:
+      name: "{{ apache_package }}"
+      state: started
+      enabled: true
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: "install apache2 and php for centos"
+    become: true
+    package:
+      name:
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: true
+    when: ansible_distribution in ["CentOS"]
+
+  - name: "start apache2 service for centos"
+    become: true
+    service:
+      name: "{{ apache_package }}"
+      state: started
+      enabled: true
+    when: ansible_distribution in ["CentOS"]
+
+  - name: "enable 80 port for centos"
+    become: true
+    firewalld:
+      port: "80/tcp"
+      state: "enabled"
+    when: ansible_distribution in ["CentOS"]
+
+...
