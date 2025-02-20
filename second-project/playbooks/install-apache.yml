@@ -3,8 +3,13 @@
 #  become: true
   tasks:
 
+  - name: "upgrade packages"
+    apt:
+      upgrade: dist
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
   - name: "install apache2 and php packages for ubuntu"
-    package:
+    apt:
       name:
         - "{{ apache_package }}"
         - "{{ php_package }}"
@@ -21,12 +26,13 @@
 
   - name: "install apache2 and php for centos"
     become: true
-    package:
+    dnf:
       name:
         - "{{ apache_package }}"
         - "{{ php_package }}"
       state: latest
       update_cache: true
+      update_only: true
     when: ansible_distribution in ["CentOS"]
 
   - name: "start apache2 service for centos"

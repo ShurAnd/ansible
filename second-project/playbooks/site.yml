@@ -1,0 +1,104 @@
+---
+- hosts: webservers
+
+  tasks:
+
+  - name: "install apache2 and php packages for ubuntu"
+    package:
+      name:
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: true
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: "start apache2 service"
+    ansible.builtin.sysvinit:
+      name: "{{ apache_package }}"
+      state: started
+      enabled: true
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: "install apache2 and php for centos"
+    become: true
+    package:
+      name:
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: true
+    when: ansible_distribution in ["CentOS"]
+
+  - name: "start apache2 service for centos"
+    become: true
+    service:
+      name: "{{ apache_package }}"
+      state: started
+      enabled: true
+    when: ansible_distribution in ["CentOS"]
+
+  - name: "enable 80 port for centos"
+    become: true
+    firewalld:
+      port: "80/tcp"
+      state: "enabled"
+    when: ansible_distribution in ["CentOS"]
+
+  - name: copy default site html
+    become: true
+    copy:
+      src: files/default-site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: '0644'
+
+- hosts: db
+  tasks:
+
+  - name: "install maria-db"
+    package:
+      name: "mariadb-server"
+      state: latest
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: "start mariadb service"
+    ansible.builtin.sysvinit:
+      name: "mariadb"
+      state: started
+      enabled: true
+
+- hosts: fileservers
+  tasks:
+
+    - name: "install samba package"
+      package:
+        name: samba
+        state: latest
+
+    - name: "start samba service"
+      ansible.builtin.sysvinit:
+        name: smbd
+        state: started
+        enabled: true
+
+- hosts: mezzanine, workstation
+
+  tasks:
+    - name: "install unzip"
+      become: true
+      package:
+        name: unzip
+        state: latest
+
+    - name: "install terraform"
+      become: true
+      unarchive:
+        src: "https://hashicorp-releases.yandexcloud.net/terraform/1.11.0-rc2/terraform_1.11.0-rc2_linux_amd64.zip"
+        dest: /usr/local/bin
+        remote_src: true
+        mode: '0755'
+        owner: root
+        group: root
+
+...
