@@ -6,8 +6,8 @@ services:
       dockerfile: dockerfile
     container_name: djo-app
     ports:
-      - 8080:80
-      - 8443:443
+      - 8084:80
+      - 9443:443
       - 2226:22
     volumes:
       - /home/andrey/ansible-files/general-files/sshd_config:/etc/ssh/sshd_config

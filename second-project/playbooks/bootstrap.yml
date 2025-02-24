@@ -1,0 +1,42 @@
+---
+
+- hosts: webservers
+  become: true
+  pre_tasks:
+
+    - name: "install updates CentOS"
+      become: true
+      dnf:
+        update_only: true
+        update_cache: true
+      when: ansible_distribution == "CentOS"
+
+    - name: "install update (ubuntu)"
+      become: true
+      apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: "create innos user"
+      become: true
+      user:
+        name: innos
+        groups: root
+
+    - name: "create innos sudoer file"
+      become: true
+      copy:
+        src: innos_sudoer
+        dest: /etc/sudoers.d/innos
+        owner: root
+        group: root
+        mode: '0440'
+
+    - name: "create ssh key for innos"
+      become: true
+      authorized_key:
+        user: innos
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3ZvBJYJHsN0sEI3J7DGdSM6E2HzHxC5oNA3ApKjyOzGBQkx3U52klH9FMySbz+2FQ6uzcSuhYD8UF9Yez7fwLlQKLHv8Mkv0A807YLiHH0WPVyEkUtFnIh+q30Sst9e0zJZ8pf2mjahTRaR/LveBG17FUfj+YxAI1imYtrlWHZcEOCjas+5X/mhCv9jY3I3HQT/6Mr1zXDM/3TmetTgTK5QT1Kkcn1FHU1lUqM8NCUjXpMG4Ryk9Nmtyb2xcRfzY8FLmZAPvP4BQlZEqiY5FEA73Gz4QJEhXNRRw5bhss3KXa3u6WeAxoul/sgKKL7nysB5ZiewbvDCxy3yPALbHshh88NgI8i1p0nY+w5i0ngAW5OtLIDqHlamuVDDIhgwd+Ft0RJZDye2nlTQEmBEs1FanEPSpJaTJL4cpXZO7+71oWTvbuZGu7g2EPJUaMEktw/nYowVKh2yF8C0ZkWa0DBrgpfbWuHPzfPNHDViTt/5JXyRmwXnyoGDiteiUnMUt8s2ZshqATU8gQ2EtxLc86eKNtvbNWZ64SLHrchLNrqEZ3pBLkisE6AcPZHbBHFQ9GVuH3HI6YKeC5sSjoHNQ6GN8bPl9gyP1DYtx5ee2LS3agP9ztAypWPVIl8119Z09QLIlSUqBDmSJHfOBKwzkykrtShRAIbmOCltn+u2uzbQ== andrey"
+
+...

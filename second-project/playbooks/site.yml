@@ -52,6 +52,46 @@
       owner: root
       group: root
       mode: '0644'
+    notify:
+      - "restart apache in centos"
+      - "restart apache in ubuntu"
+
+  - name: "Crate unnamed user"
+    become: true
+    user:
+      name: unnamed
+      groups: root
+
+  - name: "Add ssh key for unnamed user"
+    become: true
+    authorized_key:
+      user: unnamed
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3ZvBJYJHsN0sEI3J7DGdSM6E2HzHxC5oNA3ApKjyOzGBQkx3U52klH9FMySbz+2FQ6uzcSuhYD8UF9Yez7fwLlQKLHv8Mkv0A807YLiHH0WPVyEkUtFnIh+q30Sst9e0zJZ8pf2mjahTRaR/LveBG17FUfj+YxAI1imYtrlWHZcEOCjas+5X/mhCv9jY3I3HQT/6Mr1zXDM/3TmetTgTK5QT1Kkcn1FHU1lUqM8NCUjXpMG4Ryk9Nmtyb2xcRfzY8FLmZAPvP4BQlZEqiY5FEA73Gz4QJEhXNRRw5bhss3KXa3u6WeAxoul/sgKKL7nysB5ZiewbvDCxy3yPALbHshh88NgI8i1p0nY+w5i0ngAW5OtLIDqHlamuVDDIhgwd+Ft0RJZDye2nlTQEmBEs1FanEPSpJaTJL4cpXZO7+71oWTvbuZGu7g2EPJUaMEktw/nYowVKh2yF8C0ZkWa0DBrgpfbWuHPzfPNHDViTt/5JXyRmwXnyoGDiteiUnMUt8s2ZshqATU8gQ2EtxLc86eKNtvbNWZ64SLHrchLNrqEZ3pBLkisE6AcPZHbBHFQ9GVuH3HI6YKeC5sSjoHNQ6GN8bPl9gyP1DYtx5ee2LS3agP9ztAypWPVIl8119Z09QLIlSUqBDmSJHfOBKwzkykrtShRAIbmOCltn+u2uzbQ== andrey"
+
+  - name: "Add sudoers file for unnamed"
+    become: true
+    copy:
+      src: sudoer_unnamed
+      dest: /etc/sudoers.d/unnamed
+      owner: root
+      group: root
+      mode: '0440'
+
+  handlers:
+    - name: "restart apache in centos"
+      become: true
+      service:
+        name: httpd
+        state: restarted
+        enabled: true
+      when: ansible_distribution in ["CentOS"]
+
+    - name: "restart apache in ubuntu"
+      ansible.builtin.sysvinit:
+        name: apache2
+        state: restarted
+        enabled: true
+      when: ansible_distribution in ["Debian", "Ubuntu"]
 
 - hosts: db
   tasks:
@@ -100,5 +140,4 @@
         mode: '0755'
         owner: root
         group: root
-
 ...
